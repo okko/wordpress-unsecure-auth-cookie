@@ -3,23 +3,15 @@
 Plugin Name: Wordpress Unsecure Auth Cookie
 Plugin URI: https://github.com/jussikinnula/wordpress-unsecure-auth-cookie
 Description: Plug-in to disable Wordpress secure auth cookie, if the same auth cookie is wanted to be valid for both HTTP and HTTPS side of a website.
-Version: 0.1
+Version: 0.2
 Author: Jussi Kinnula / Frantic
 Author URI: http://www.frantic.com
 License: GPLv2
  */
 
 /**
- * Setting option(s)
- */
-
-if ( !get_site_option('wordpress_unsecure_auth_cookie_installed') ) {
-	add_site_option('wordpress_unsecure_auth_cookie_installed', true);
-}
-
-/**
  * The wp_set_auth_cookie is directly copied from WordPress' pluggable.php -file,
- * and modified 
+ * and modified to not to set secure bit, if environment variable is set.
  */
 
 if ( !function_exists('wp_set_auth_cookie') ) :
@@ -89,10 +81,7 @@ function wp_set_auth_cookie($user_id, $remember = false, $secure = '') {
 	 */
 	$secure_logged_in_cookie = apply_filters( 'secure_logged_in_cookie', $secure_logged_in_cookie, $user_id, $secure );
 
-	/**
-	 * If $unsecure_cookie_domain was set correctly, secure auth cookie is never used.
-	 */
-	if ( get_site_option('wordpress_unsecure_auth_cookie_installed') ) {
+	if ( defined('FORCE_UNSECURE_AUTH_COOKIE') ) {
 		$auth_cookie_name = AUTH_COOKIE;
 		$scheme = 'auth';
 		$secure_logged_in_cookie = false;
@@ -147,5 +136,3 @@ function wp_set_auth_cookie($user_id, $remember = false, $secure = '') {
 		setcookie(LOGGED_IN_COOKIE, $logged_in_cookie, $expire, SITECOOKIEPATH, COOKIE_DOMAIN, $secure_logged_in_cookie, true);
 }
 endif;
-
-?>
