@@ -11,7 +11,7 @@ To enable the plug-in, you need to also add the following lines to your wp-confi
 ```
     define('FORCE_UNSECURE_AUTH_COOKIE', getenv('FORCE_UNSECURE_AUTH_COOKIE') == 'true');
     if (defined('FORCE_UNSECURE_AUTH_COOKIE')) {
-        define('COOKIEHASH', md5( $_SERVER['HTTP_HOST'] ) );
+        define('COOKIEHASH', md5( strtolower( $_SERVER['HTTP_HOST'] ) ) );
     }
 ```
 
